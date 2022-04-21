@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <title>教师主页</title>
+    <script th:inline="javascript">
+    </script>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="/Tmain" th:text="${session.UserSession.username} + ' 老师'">个人主页</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/Tlogin">退出登陆</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/NewEdit">添加新课程</a>
+    </li>
+</ul>
+<table class="table">
+    <thead>
+    <tr>
+        <th>课程名</th>
+        <th>学分</th>
+        <th>授课老师</th>
+        <th>限选人数</th>
+        <th>已选人数</th>
+        <th>简介</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="courses:${course}">
+        <td th:text="${courses.cname}">课程名</td>
+        <td th:text="${courses.credit}">学分</td>
+        <td th:text="${courses.teacher}">授课老师</td>
+        <td th:text="${courses.Slimit}">限选人数</td>
+        <td th:text="${courses.selected}">已选人数</td>
+        <td th:text="${courses.introduce}">简介</td>
+        <td><a th:href="@{'/edit/'+${courses.cid}}"><button class="btn btn-primary">修改</button></a></td>
+        <td><a th:href="@{'/delete/'+${courses.cid}}"><button class="btn btn-danger">删除</button></a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

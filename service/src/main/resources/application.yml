@@ -1,0 +1,12 @@
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///addd416?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 107058seed00UC
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
