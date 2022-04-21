@@ -53,10 +53,10 @@ public class IndexController {
     }
 
     @PostMapping("/Tlogin")
-    public String Tlogin(Teacher teacher,
-                         HttpSession session,
-                         Model model,
-                         HttpServletResponse response){
+    public Result Tlogin(Teacher teacher,
+                                 HttpSession session,
+                                 Model model,
+                                 HttpServletResponse response){
 
         Teacher teachertemp = teacherMapper.selectById(teacher.userid);
 
@@ -64,10 +64,10 @@ public class IndexController {
             teacher = teachertemp;
             session.setAttribute("UserSession", teacher);
 
-            return "redirect:/Tmain";
+            return Result.ok();
         }else{
             model.addAttribute("msg","账号或密码错误！");
-            return "Tlogin";
+            return Result.fail();
         }
     }
 }
