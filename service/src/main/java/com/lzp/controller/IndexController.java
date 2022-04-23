@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -23,26 +24,16 @@ public class IndexController {
     @Autowired
     TeacherMapper teacherMapper;
 
-    @GetMapping(value = {"/index","/login","/"})
-    public String login(){
-        return "login";
-    }
-
+    @ResponseBody
     @PostMapping("/login")
-    public Result login(Student student,
-                        HttpSession session,
-                        Model model,
-                        HttpServletResponse response){
+    public Result login(Student student){
 
         Student studentTemp = studentMapper.selectById(student.userid);
 
         if(studentTemp.password.equals(student.password)){
             student = studentTemp;
-            session.setAttribute("UserSession", student);
-
-            return Result.ok();
+            return Result.ok(student);
         }else{
-            model.addAttribute("msg","账号或密码错误！");
             return Result.fail();
         }
     }

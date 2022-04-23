@@ -36,41 +36,38 @@ public class Result<T> {
         return result;
     }
 
-    public static <T> Result<T> build(Integer code, String message) {
-        Result<T> result = build(null);
-        result.setCode(code);
-        result.setMessage(message);
+    public static <T> Result<T> build(ResultCodeEnum resultCodeEnum) {
+        Result<T> result = new Result<T>();
+        result.setCode(resultCodeEnum.getCode());
+        result.setMessage(resultCodeEnum.getMessage());
         return result;
     }
 
+    //操作成功
     public static<T> Result<T> ok(){
         return Result.ok(null);
     }
 
-    /**
-     * 操作成功
-     * @param data
-     * @param <T>
-     * @return
-     */
     public static<T> Result<T> ok(T data){
         Result<T> result = build(data);
         return build(data, ResultCodeEnum.SUCCESS);
     }
 
+
+    //操作失败
     public static<T> Result<T> fail(){
         return Result.fail(null);
     }
 
-    /**
-     * 操作失败
-     * @param data
-     * @param <T>
-     * @return
-     */
     public static<T> Result<T> fail(T data){
         Result<T> result = build(data);
         return build(data, ResultCodeEnum.FAIL);
+    }
+
+    public static <T> Result<T> fail(ResultCodeEnum resultCodeEnum) {
+        Result<T> result = build(null);
+        result.build(resultCodeEnum);
+        return result;
     }
 
     public Result<T> message(String msg){

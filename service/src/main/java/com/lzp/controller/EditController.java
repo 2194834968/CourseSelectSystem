@@ -1,57 +1,55 @@
 package com.lzp.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lzp.Mapper.CourseMapper;
+import com.lzp.common.result.Result;
 import com.lzp.model.Course;
 import com.lzp.model.Teacher;
+import com.lzp.vo.NewCourseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Controller
+import static com.lzp.common.result.ResultCodeEnum.COURSENAME_REPEAT;
+
+@RestController
 public class EditController {
     @Autowired
     CourseMapper courseMapper;
 
-    @GetMapping("/NewEdit")
-    public String Edit(Model model,
-                       HttpServletRequest request){
-        Course coursetemp = new Course();
-        model.addAttribute("coursetemp",coursetemp);
-        return "NewEdit";
-    }
-
     @PostMapping("/NewEdit")
-    public String NewEdit(Model model,
-                          HttpServletRequest request,
-                          Course course){
+    public Result NewEdit(NewCourseVO newCourseVO){
 
-        Teacher UserSession = (Teacher) request.getSession().getAttribute("UserSession");
-        Course coursetemp = courseMapper.selectById(course.cid);
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.eq("cname",newCourseVO.cname);
+        Course coursetemp = courseMapper.selectOne(wrapper);
+
         if(coursetemp != null){
-            model.addAttribute("msg","课程代码已存在，请重新输入！");
-            Course coursetemp2 = new Course();
-            model.addAttribute("coursetemp",coursetemp2);
-            return "NewEdit";
+            return Result.build(COURSENAME_REPEAT);
         }
         else{
-            course.selected = 0;
-            int result =  courseMapper.insert(course);
-            return "redirect:/Tmain";
+            QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
+            queryWrapper.select("max(cid) as cid");
+            Course newCourseTemp = new Course();
+            newCourseTemp.cid = courseMapper.selectOne(queryWrapper).cid+1;
+            newCourseTemp.cname = newCourseVO.cname;
+            newCourseTemp.credit = newCourseVO.credit;
+            newCourseTemp.teacher = newCourseVO.teacher;
+            newCourseTemp.Slimit = newCourseVO.Slimit;
+            newCourseTemp.selected = 0;
+            newCourseTemp.introduce = newCourseVO.introduce;
+            int result =  courseMapper.insert(newCourseTemp);
+            return Result.ok();
         }
     }
 
-    @GetMapping("/edit/{cid}")
-    public String Edit(Model model,
-                       HttpServletRequest request,
-                       @PathVariable int cid){
+    @PutMapping("/edit/{cid}")
+    public Result<Course> Edit(@PathVariable int cid){
         Course coursetemp = courseMapper.selectById(cid);
-        model.addAttribute("coursetemp",coursetemp);
-        return "edit";
+        return Result.ok(coursetemp);
     }
 
     @PostMapping("/edit")
