@@ -1,7 +1,9 @@
 package com.lzp.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lzp.Mapper.StudentMapper;
 import com.lzp.common.result.Result;
+import com.lzp.model.Course;
 import com.lzp.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,28 +19,15 @@ public class registerController {
     @Autowired
     StudentMapper studentMapper;
 
-    @GetMapping("/register")
-    public  String register(){
-        return "register";
-    }
-
     @PostMapping("/register")
-    public Result register(Student student, HttpSession session, Model model){
+    public Result register(Student student){
 
-        Student studentNew = studentMapper.selectById(student.userid);
-        if (studentNew == null){
-            Student studentTemp = new Student(student.userid,
-                    student.username,
-                    student.password);
+        QueryWrapper<Student> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("max(userid)");
+        Long newUserid = Long.parseLong(studentMapper.selectOne(queryWrapper).userid)+1;
+        Student studentTemp = new Student(newUserid.toString(), student.username,student.password);
 
-            int result = studentMapper.insert(studentTemp);
-            //System.out.println(result);
-            model.addAttribute("msg","注册成功，请重新登录");
-            return Result.ok();
-        }
-        else{
-            model.addAttribute("msg","该账号已存在，请重新输入！");
-            return Result.fail();
-        }
+        int result = studentMapper.insert(studentTemp);
+        return Result.ok();
     }
 }

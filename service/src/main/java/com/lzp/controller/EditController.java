@@ -6,6 +6,7 @@ import com.lzp.common.result.Result;
 import com.lzp.model.Course;
 import com.lzp.model.Teacher;
 import com.lzp.vo.NewCourseVO;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.lzp.common.result.ResultCodeEnum.COURSENAME_REPEAT;
+import static com.lzp.common.result.ResultCodeEnum.*;
 
 @RestController
+@RequestMapping("/edit")
 public class EditController {
     @Autowired
     CourseMapper courseMapper;
 
+    @ApiOperation(value = "提交编辑完的新课程")
     @PostMapping("/NewEdit")
     public Result NewEdit(NewCourseVO newCourseVO){
 
@@ -29,8 +32,7 @@ public class EditController {
 
         if(coursetemp != null){
             return Result.build(COURSENAME_REPEAT);
-        }
-        else{
+        }else{
             QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
             queryWrapper.select("max(cid) as cid");
             Course newCourseTemp = new Course();
@@ -46,35 +48,37 @@ public class EditController {
         }
     }
 
-    @PutMapping("/edit/{cid}")
+    @ApiOperation(value = "获取cid对应课程，准备修改")
+    @GetMapping("/{cid}")
     public Result<Course> Edit(@PathVariable int cid){
         Course coursetemp = courseMapper.selectById(cid);
         return Result.ok(coursetemp);
     }
 
-    @PostMapping("/edit")
-    public String Edit(Model model,
-                       HttpServletRequest request,
-                       Course course){
+    @ApiOperation(value = "提交修改完的课程")
+    @PostMapping("/SubmitEdit")
+    public Result Edit(Course course){
 
-        Teacher UserSession = (Teacher) request.getSession().getAttribute("UserSession");
         Course coursetemp = courseMapper.selectById(course.cid);
         int result;
         if(coursetemp != null){
             result = courseMapper.updateById(course);
+            return Result.ok();
+        }else{
+            return Result.fail(EDIT_FAIL);
         }
-        else{
-            course.selected = 0;
-            result =  courseMapper.insert(course);
-        }
-        return "redirect:/Tmain";
     }
 
+    @ApiOperation(value = "删除cid指定的课程")
     @GetMapping("/delete/{cid}")
-    public String DeleteEdit(Model model,
-                             HttpServletRequest request,
-                             @PathVariable int cid){
-        int result = courseMapper.deleteById(cid);
-        return "redirect:/Tmain";
+    public Result DeleteEdit(@PathVariable int cid){
+        int reselt = courseMapper.deleteById(cid);
+        Course coursetemp = courseMapper.selectById(cid);
+        if(coursetemp == null){
+            return Result.ok();
+        }else{
+            return Result.fail(DELETE_FAIL);
+        }
+
     }
 }
