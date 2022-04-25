@@ -6,11 +6,12 @@ import lombok.Data;
 @Data
 public class sc {
     @TableId
-    public String sid;
-    public int cid1;
+    public int scid;
+    public int sid;
+    public int cid;
 
-    public sc(String sid,int cid){
+    public sc(int sid,int cid){
         this.setSid(sid);
-        this.setCid1(cid);
+        this.setCid(cid);
     }
 }

@@ -8,15 +8,23 @@ import com.lzp.common.result.Result;
 import com.lzp.model.Course;
 import com.lzp.model.Student;
 import com.lzp.model.sc;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
-@Controller
+import static com.lzp.common.result.ResultCodeEnum.COURSE_SELECTED;
+import static com.lzp.common.result.ResultCodeEnum.COURSE_UN_SELECTED;
+
+@RestController
+@RequestMapping("/course")
 public class selectController {
     @Autowired
     CourseMapper courseMapper;
@@ -27,54 +35,52 @@ public class selectController {
     @Autowired
     SCMapper scMapper;
 
-    @GetMapping("/select/{cid}")
-    public String select(Model model,
-                         HttpServletRequest request,
+    @ApiOperation(value = "添加userid用户所选的cid课程")
+    @GetMapping("/{userid}/select/{cid}")
+    public Result select(@PathVariable int userid,
                          @PathVariable int cid){
 
-        //查询该用户已选课表
-        Student UserSession = (Student) request.getSession().getAttribute("UserSession");
-        sc usersc = scMapper.selectById(UserSession.userid);
-        QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
-
-        if (usersc != null) {
-            //如果该用户已有选课
-            model.addAttribute("msg","你已经选了一门课！");
-        }else{
-            //更新选课表
-            sc scTemp = new sc(UserSession.userid,cid);
-            int result = scMapper.insert(scTemp);
-            //更新课程表
-            Course courseTemp = courseMapper.selectById(cid);
-            courseTemp.selected = courseTemp.selected + 1;
-            result =  courseMapper.updateById(courseTemp);
-            //System.out.println(result);
+        QueryWrapper<sc> scWrapper = new QueryWrapper<>();
+        scWrapper.eq("sid",userid);
+        List<sc> usersc = scMapper.selectList(scWrapper);
+        for(sc i : usersc){
+            if(i.cid == cid){
+                return Result.fail(COURSE_SELECTED);
+            }
         }
+        //更新选课表
+        sc scTemp = new sc(userid,cid);
+        int result = scMapper.insert(scTemp);
+        //更新课程表对应课程的选课人数
+        Course courseTemp = courseMapper.selectById(cid);
+        courseTemp.selected = courseTemp.selected + 1;
+        result =  courseMapper.updateById(courseTemp);
 
-        //重新加载main页面
-        return "redirect:/main";
+        return Result.ok();
     }
 
-    @GetMapping("/deselect/{cid}")
-    public String deselect(Model model,
-                         HttpServletRequest request,
-                         @PathVariable int cid){
+    @ApiOperation(value = "删除userid用户所选的cid课程")
+    @GetMapping("/{userid}/deselect/{cid}")
+    public Result deselect(@PathVariable int userid,
+                           @PathVariable int cid){
         //查询该用户已选课表
-        Student UserSession = (Student) request.getSession().getAttribute("UserSession");
-        sc usersc = scMapper.selectById(UserSession.userid);
-        QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<sc> scWrapper = new QueryWrapper<>();
+        scWrapper.eq("sid",userid);
+        List<sc> usersc = scMapper.selectList(scWrapper);
+        for(sc i : usersc){
+            if(i.cid == cid){
+                //更新选课表
+                scWrapper.eq("cid",cid);
+                int result = scMapper.delete(scWrapper);
+                //更新课程表对应课程的选课人数
+                Course courseTemp = courseMapper.selectById(cid);
+                courseTemp.selected = courseTemp.selected - 1;
+                result =  courseMapper.updateById(courseTemp);
 
-        //更新选课表
-        int result = scMapper.deleteById(UserSession.userid);
-        //更新课程表
-        Course courseTemp = courseMapper.selectById(cid);
-        courseTemp.selected = courseTemp.selected - 1;
-
-        result =  courseMapper.updateById(courseTemp);
-        //System.out.println(result);
-
-        //重新加载main页面
-        return "redirect:/main";
+                return Result.ok();
+            }
+        }
+        return Result.fail(COURSE_UN_SELECTED);
     }
 
 }

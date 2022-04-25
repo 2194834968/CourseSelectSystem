@@ -7,7 +7,7 @@ import lombok.Data;
 public class NewCourseVO {
     public String cname;
     public String credit;
-    public String teacher;
+    public int tid;
     public int Slimit;
     public String introduce;
 }

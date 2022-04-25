@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class Teacher {
     @TableId
-    public String userid;
+    public int userid;
     public String username;
     public String password;
 
-    public Teacher(String userid, String username, String password){
+    public Teacher(int userid, String username, String password){
         this.setUserid(userid);
         this.setUsername(username);
         this.setPassword(password);

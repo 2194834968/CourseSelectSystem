@@ -9,6 +9,7 @@ public class Course {
     public int cid;
     public String cname;
     public String credit;
+    public int tid;
     public String teacher;
     public int Slimit;
     public int selected;

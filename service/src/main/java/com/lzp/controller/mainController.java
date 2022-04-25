@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+import static com.lzp.common.result.ResultCodeEnum.COURSE_SELECTED;
+
 @RestController
 @RequestMapping("/main")
 public class mainController {
@@ -39,7 +41,7 @@ public class mainController {
     @ApiOperation(value = "获取该学生的已选课表")
     @PostMapping("{userid}/StudentCoursePage/{current}/{limit}")
     //{current}为当前页，{limit}为页长限制
-    public Result findStudentCourse(@PathVariable long userid,
+    public Result findStudentCourse(@PathVariable int userid,
                                     @PathVariable long current,
                                     @PathVariable long limit,
                                     @RequestBody(required = false) CourseQueryVo courseQueryVo){
@@ -61,9 +63,10 @@ public class mainController {
         }
 
         //如果该学生有已选课，写入搜索条件
-        sc usersc = scMapper.selectById(userid);
-        if(usersc != null){
-            wrapper.eq("cid",usersc.cid1);
+        QueryWrapper<sc> scWrapper = new QueryWrapper<>();
+        scWrapper.eq("sid",userid);
+        List<sc> usersc = scMapper.selectList(scWrapper);
+        for(sc i : usersc){
         }
 
 
@@ -74,7 +77,7 @@ public class mainController {
 
     @ApiOperation(value = "获取该学生的未选课表")
     @PostMapping("{userid}/CoursePage/{current}/{limit}")
-    public Result findPageCourse(@PathVariable long userid,
+    public Result findPageCourse(@PathVariable int userid,
                                  @PathVariable long current,
                                  @PathVariable long limit,
                                  @RequestBody(required = false) CourseQueryVo courseQueryVo){
@@ -96,9 +99,10 @@ public class mainController {
         }
 
         //如果该学生有已选课，写入搜索条件
-        sc usersc = scMapper.selectById(userid);
-        if(usersc != null){
-            wrapper.ne("cid",usersc.cid1);
+        QueryWrapper<sc> scWrapper = new QueryWrapper<>();
+        scWrapper.eq("sid",userid);
+        List<sc> usersc = scMapper.selectList(scWrapper);
+        for(sc i : usersc){
         }
 
 
