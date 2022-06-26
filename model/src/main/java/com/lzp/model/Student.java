@@ -11,16 +11,9 @@ public class Student {
     public String username;
     public String password;
 
-
     public Student(String username, String password){
-        this.setUsername(username);
-        this.setPassword(password);
-        return ;
-    }
-    public Student(int userid, String username, String password){
         this.setUserid(userid);
         this.setUsername(username);
         this.setPassword(password);
-        return ;
     }
 }

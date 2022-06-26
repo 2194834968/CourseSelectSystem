@@ -1,23 +1,14 @@
 package com.lzp.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lzp.Mapper.StudentMapper;
 import com.lzp.Mapper.TeacherMapper;
 import com.lzp.common.result.Result;
-import com.lzp.common.result.ResultCodeEnum;
 import com.lzp.model.Student;
 import com.lzp.model.Teacher;
 import com.lzp.vo.StudentRegisterVO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import static com.lzp.common.result.ResultCodeEnum.STUDENT_USERNAME_EXIST;
 
 @RestController
 @RequestMapping("/index")
